@@ -1,22 +1,49 @@
 <?php include("../template/cabecera.php"); ?>
 <?php
-$txtID=(isset($_POST['txtID']))?$_POST['txtID']:"";
 
+$txtTipo=(isset($_POST['txtTipo']))?$_POST['txtTipo']:"";
+$txtDescripcion=(isset($_POST['txtDescripcion']))?$_POST['txtDescripcion']:"";
+$txtEstado=(isset($_POST['txtEstado']))?$_POST['txtEstado']:"";
+$txtImagen=(isset($_FILES['txtImagen']['name']))?$_FILES['txtImagen']['name']:"";
+$accion=(isset($_POST['accion']))?$_POST['accion']:"";
+
+include("../config/db.php");
+
+switch($accion){
+
+
+        case"Agregar":
+
+            $sentenciaSQL = $conexion->prepare("INSERT INTO tickets (tipo_p, descrip, estado, imagen) VALUES (:tipo, :descripcion, :estado, :imagen)");
+            $sentenciaSQL->bindParam(':tipo', $txtTipo);
+            $sentenciaSQL->bindParam(':descripcion', $txtDescripcion);
+            $sentenciaSQL->bindParam(':estado', $txtEstado);
+            $sentenciaSQL->bindParam(':imagen', $txtImagen);
+            $sentenciaSQL->execute();
+
+            echo "Presionando botón agregar";
+            break;
+            case"Modificar":
+                echo "Presionando botón agregar";
+                break;
+                case"Cancelar":
+                    echo "Presionando botón agregar";
+                    break;
+}      
+
+$sentenciaSQL=$conexion->prepare("SELECT * FROM tickets");
+$sentenciaSQL->execute();
+$listaReportes=$sentenciaSQL->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <div class="col-md-6">
     
     <form method="POST" enctype="multipart/form-data">
     
-    <div class = "form-group">
-    <label for="txtID">ID:</label>
-    <input type="text" class="form-control" name="txtID" id="txtID" placeholder="Inserte ID">
-    </div>
-    
     
     <div class = "form-group">
     <label for="txtTipo">TIPO DE PROBLEMA:</label>
-    <input type="text" class="form-control" name="txtTipo" id="txtTipo" placeholder="Inserte tipo de Problema (HARDWARE, SOFTWARE o REDES)">
+    <input type="text" class="form-control" name="txtTipo" id="txtTipo" placeholder="Inserte tipo de Problema (Hardware, Software o Redes)">
     </div>
 
     <div class = "form-group">
@@ -25,22 +52,12 @@ $txtID=(isset($_POST['txtID']))?$_POST['txtID']:"";
     </div>
    
     <div class = "form-group">
-    <label for="txtFecha">FECHA:</label>
-    <input type="text" class="form-control" name="txtFecha" id="txtFecha" placeholder="Inserte la Fecha de inicio del problema">
+    <label for="txtEstado">ESTADO:</label>
+    <input type="text" class="form-control" name="txtEstado" id="txtEstado" placeholder="Inserte Estado (Pendiente o Finalizado)">
     </div>
 
     <div class = "form-group">
-    <label for="txtHora">HORA:</label>
-    <input type="text" class="form-control" name="txtHora" id="txtHora" placeholder="Inserte la hora de inicio del problema">
-    </div>
-
-    <div class = "form-group">
-    <label for="txtHoraR">TIEMPO DE RESOLUCION:</label>
-    <input type="text" class="form-control" name="txtHoraR" id="txtHoraR" placeholder="Inserte la hora de finalización del problema">
-    </div>
-
-    <div class = "form-group">
-    <label for="txtEstado">Adjuntos (Opcional):</label>
+    <label for="txtImagen">Adjuntos (Opcional):</label>
     <input type="file" class="form-control" name="txtImagen" id="txtImagen" placeholder="Inserte Imagen">
     </div>
     
@@ -64,25 +81,24 @@ $txtID=(isset($_POST['txtID']))?$_POST['txtID']:"";
                 <th>ID</th>
                 <td>Tipo de problema</td>
                 <td>Descripción</td>
-                <td>Fecha</td>
-                <td>Hora</td>
-                <td>Tiempo de resolución</td>
+                <td>Estado</td>
                 <td>Adjuntos.png</td>
                 <td>Acción</td>
                 
             </tr>
         </thead>
         <tbody>
+            <?php foreach($listaReportes as $reporte){ ?>
             <tr>
-                <td>1</td>
-                <td>Redes</td>
-                <td>ever tapado las redes acuiferas del baño</td>
-                <td>18/10/2023</td>
-                <td>14:03 p.m.</td>
-                <td>2 Hr</td>
-                <td>Adjuntos.png</td>
+                <td><?php echo $reporte['id']?></td>
+                <td><?php echo $reporte['tipo_p']?></td>
+                <td><?php echo $reporte['descrip']?></td>
+                <td><?php echo $reporte['estado']?></td>
+                <td><?php echo $reporte['imagen']?></td>
+                
                 <td>Seleccionar | Borrar</td>
             </tr>
+            <?php } ?>
             <tr>
                 <td scope="row"></td>
                 <td></td>
